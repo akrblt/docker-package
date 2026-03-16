@@ -1,0 +1,56 @@
+name: Artefacts et Cache
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      # Étape 3 : Utilisation du cache pour node_modules
+      - name: Mise en cache des dépendances
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Installation de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installer les dépendances
+        run: npm install
+
+      # Étape 2 : Générer le fichier build-info.txt
+      - name: Générer build-info.txt
+        run: |
+          echo "Date du build : $(date)" > build-info.txt
+          echo "SHA du commit : ${{ github.sha }}" >> build-info.txt
+
+      # Étape 4 : Sauvegarder build-info.txt comme artefact
+      - name: Sauvegarder l'artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: info-du-build
+          path: build-info.txt
+
+  display:
+    # Étape 5 : Second job qui dépend du premier
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Télécharger l'artefact
+        uses: actions/download-artifact@v4
+        with:
+          name: info-du-build
+
+      - name: Afficher le contenu de l'artefact
+        run: cat build-info.txt
