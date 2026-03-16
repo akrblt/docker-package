@@ -1,0 +1,40 @@
+name: Matrix de builds multi-versions
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-node:
+    runs-on: ubuntu-latest
+    
+    # Étape 2 : Configuration de la stratégie Matrix
+    strategy:
+      matrix:
+        node-version: [18, 20, 22] # Les versions à tester en parallèle
+
+    steps:
+      # Étape 3a : Checkout le code
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      # Étape 3b : Setup Node avec la version de la matrice
+      - name: Installation de Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Étape 3c : Installe les dépendances
+      - name: Installation des dépendances
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            echo "Pas de package-lock.json, simulation de npm install..."
+          fi
+
+      # Étape 3d : Lance le test
+      - name: Exécution des tests
+        run: npm test
