@@ -1,0 +1,26 @@
+name: Apprendre les déclencheurs
+
+# 2. Madde: Tetikleyicileri (Events) yapılandırıyoruz
+on:
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - 'v*' # v1.0, v2.1 gibi tag'ler push edildiğinde çalışır
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Manuel olarak başlatma butonunu ekler
+
+jobs:
+  affichage-info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      # 3. Madde: Tetikleyici türünü ekrana basan adım
+      - name: Afficher le type d'événement
+        # github.event_name değişkeni hangi olayın tetiklediğini söyler
+        run: echo "Déclenché par: ${{ github.event_name }}"
