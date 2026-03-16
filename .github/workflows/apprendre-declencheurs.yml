@@ -23,4 +23,4 @@ jobs:
       # 3. Madde: Tetikleyici türünü ekrana basan adım
       - name: Afficher le type d'événement
         # github.event_name değişkeni hangi olayın tetiklediğini söyler
-        run: echo "Déclenché par: ${{ github.event_name }}"
+        run: echo "Déclenché par ${{ github.event_name }}"
